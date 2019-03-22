@@ -1,0 +1,7 @@
+Minha função de crossover está fazendo convergir para um máximo local, que não é um global, e sem a mutação eu não consigo sair dele. Chega um momento em que todos os indivíduos da população são iguais!
+
+Coloquei uma função de mutação, antes estava sem, porque eu achei que não precisaria. Mas precisa, para fazer sair desse máximo local mesmo. Coloquei uma que escolhe índices aleatórios do indivíduo e os troca. Dessa forma, agora está conseguindo encontrar uma solução. O que eu acho esquisito é que ainda chegam momentos em que a população toda é igual. Esses testes foram com uma população de 10 tabuleiros, então talvez seja isso que faz com que rapidamente viciem.
+
+(1) Agora tem uma população crescente, com controle de população, e morte por idade além da morte por fitness.
+
+TODO: verificar com e sem (1), e procurar por bons parâmetros.
