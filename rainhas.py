@@ -76,7 +76,7 @@ def select_parents_test():
 
 def recombine(parents):
     # my recombine function will choose a random number to cut,
-    # and then find where they appear on each other's chromosome,
+    # and then find where they appear on each other's genes,
     # so i'll keep it always a permutation.
     p1,p2 = parents[0].copy(),parents[1].copy()
     max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
@@ -142,7 +142,7 @@ def select_survivors(pop):
 def pprint_gen(g):
     print(g)
 
-def visualize_chrom(g):
+def visualize_gen(g):
     for i in g:
         for j in range(8):
             if j==i:
@@ -181,15 +181,6 @@ def solve_it(pop_init_size=2,pop_limit=20):
     solution = pop[ev.index(min(ev))]
     print('eval_indie(solution) =', eval_indie(solution))
     pprint_gen(solution)#  pop[0])
-    visualize_chrom(solution)
+    visualize_gen(solution)
 
 solve_it()
-"""
-chromosomes_found = [
-    [5, 7, 1, 3, 0, 6, 4, 2],
-    [6, 4, 3, 0, 1, 5, 7, 2],
-    [7, 1, 6, 3, 0, 4, 2, 5]
-]
-
-evaluate_test()
-"""
