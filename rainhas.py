@@ -129,9 +129,15 @@ def select_survivors(pop):
     ev = evaluate(pop)
     # print('pre-select:', len(pop))
     l,_ = zip(*sorted(zip(pop, ev), key=lambda x:x[1]))
-    survivors = list(l[:-2])
-    # print('post-select:', len(survivors))
-    return survivors
+    l = list(l)
+    # I could just remove the last two from l, but then I would return
+    # a sorted by fitness population, and I would lose information about
+    # how old they are.
+    pop.remove(l[-1])
+    pop.remove(l[-2])
+    
+    # print('post-select:', len(pop))
+    return pop
 
 def pprint_gen(g):
     print(g)
