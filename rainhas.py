@@ -14,65 +14,49 @@ def initialise(n):
     # population is represented as an array where each index is the column,
     # and the elements are the lines. 
     # ex: [0, 1, 2, 3, 4, 5, 6, 7] is a diagonal composed of queens.
-    init = [0, 1, 2, 3, 4, 5, 6, 7]
-    pop = [ random.sample(init, len(init)) for i in range(n) ]
-    return pop
+    initial_gene = [0, 1, 2, 3, 4, 5, 6, 7]
+    population = [ random.sample(initial_gene, len(initial_gene)) for i in range(n) ]
+    return population
 
-def evaluate(pop):
-    ev = [ eval_indie(i) for i in pop ]
-    return ev
-
-def evaluate_test(a):
-    print(evaluate([a]))
+def evaluate(population):
+    evaluation = [ eval_indie(i) for i in population ]
+    return evaluation
 
 def eval_indie(indie):
-    pena = 0
+    penalty = 0
     seen = []
     for (idx, val) in enumerate(indie):
         for s in seen:
             if val == s[1]:
-                pena += 1
+                penalty += 1
         else:
             seen.append((idx, val))
         if not set(seen).isdisjoint(diagonal_hits((idx, val))):
-            pena += 1
-    return pena
+            penalty += 1
+    return penalty
 
 def diagonal_hits(line_column):
     line,column = line_column
-    ret = []
+    positions_hit = []
     for i in range(1,8):
         if line+i < 8:
             if column+i < 8:
-                ret.append((line+i, column+i))
+                positions_hit.append((line+i, column+i))
             if column-i >= 0:
-                ret.append((line+i, column-i))
+                positions_hit.append((line+i, column-i))
         if line-i >= 0:
             if column-i >= 0:
-                ret.append((line-i, column-i))
+                positions_hit.append((line-i, column-i))
             if column+i < 8:
-                ret.append((line-i, column+i))
-    return ret
+                positions_hit.append((line-i, column+i))
+    return positions_hit
 
-def diagonal_hits_test():
-    print('diagonal_hits_tests...')
-    assert diagonal_hits((0,0)) == [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7)], ('erro: ', diagonal_hits((1,1)))
-    print('OK')
-
-def eval_indie_test():
-    chosen = [2, 7, 0, 6, 1, 3, 4, 5]
-    pprint_gen(chosen)
-    print('-> %d' % (eval_indie(chosen)))
-
-def select_parents(pop):
-    r5 = random.choices(pop, k=5)
-    ev5 = evaluate(r5)
-    b2,_ = zip(*sorted(zip(r5, ev5), key=lambda x: x[1]))
-    return list(b2[:2])
-
-def select_parents_test():
-    for i in select_parents(initialise(10)):
-        pprint_gen(i)
+def select_parents(population):
+    # choose 5 random individuals, and then get the best 2 of those.
+    random_five_parents = random.choices(population, k=5)
+    parents_evaluation = evaluate(random_five_parents)
+    best_two_parents,_ = zip(*sorted(zip(random_five_parents, parents_evaluation), key=lambda x: x[1]))
+    return list(best_two_parents[:2])
 
 def recombine(parents):
     # my recombine function will choose a random number to cut,
@@ -91,62 +75,34 @@ def recombine(parents):
                 continue
     return [p1,p2]
 
-def binary_sum(arr):
-    total = 0
-    for i in arr:
-        total += int(i,2)
-    return total
-
-def recombine_test():
-    for i in range(1):
-        p = initialise(10)[:2]
-        pprint_gen(p[0])
-        pprint_gen(p[1])
-        p = recombine(p)
-        pprint_gen(p[0])
-        pprint_gen(p[1])
-
 def mutate(offspring):
     # i'll mutate an individual by permutating random indexes.
-    offs_ret = offspring.copy()
-    for off_ret in offs_ret:
-        for (idx,_) in enumerate(off_ret):
+    for o in offspring:
+        for (idx,_) in enumerate(o):
             if random.random() < 0.3:
                 other_idx=random.randrange(8)
-                off_ret[idx],off_ret[other_idx]=off_ret[other_idx],off_ret[idx]
+                o[idx],o[other_idx]=o[other_idx],o[idx]
 
     return offspring # off_ret
 
-def mutate_test():
-    indie = [initialise(10)[1]]
-    for i in indie:
-        pprint_gen(i)
-    mutated = mutate(indie)
-    for i in mutated:
-        pprint_gen(i)
-
-def select_survivors(pop):
-    ev = evaluate(pop)
-    # print('pre-select:', len(pop))
-    l,_ = zip(*sorted(zip(pop, ev), key=lambda x:x[1]))
-    l = list(l)
-    # I could just remove the last two from l, but then I would return
-    # a sorted by fitness population, and I would lose information about
-    # how old they are.
-    pop.remove(l[-1])
-    pop.remove(l[-2])
+def select_survivors(population):
+    # two worst individuals won't be considered for the next generation.
+    evaluation = evaluate(population)
+    # print('pre-select:', len(population))
+    minney = evaluation.index(min(evaluation))
+    del population[minney]
+    del evaluation[minney]
+    minney = evaluation.index(min(evaluation))
+    del population[minney]
     
-    # print('post-select:', len(pop))
-    return pop
+    # print('post-select:', len(population))
+    return population
 
-def pprint_gen(g):
-    print(g)
-
-def visualize_gen(g):
+def visualize_gene(g):
     for i in g:
         for j in range(8):
             if j==i:
-                print('o',end='')
+                print('q',end='')
             else:
                 print('.',end='')
             if j < 7:
@@ -154,33 +110,69 @@ def visualize_gen(g):
         print()
 
 def solve_it(pop_init_size=2,pop_limit=20):
-    pop = initialise(pop_init_size)
-    ev = evaluate(pop)
+    population = initialise(pop_init_size)
+    evaluation = evaluate(population)
     i = 0
-    while min(ev) != 0:
-        parents = select_parents(pop)
+    while min(evaluation) != 0:
+        parents = select_parents(population)
         offspring = mutate(recombine(parents))
-        if len(pop) < pop_limit: # controle populacional
+        if len(population) < pop_limit: # controle populacional
             # print('i=',i,len(pop))
-            pop = pop + offspring
+            population = population + offspring
             # print('p',len(pop))
         if i % 10 == 0: # morte por idade
-            pop = pop[2:]
+            population = population[2:]
             # print('morte por idade', len(pop))
-        pop = select_survivors(pop) + offspring
+        population = select_survivors(population) + offspring
         # print('pos-selecao',len(pop))
-        ev = evaluate(pop)
+        evaluation = evaluate(population)
         if i % 500 == 0:
             print('i:',i)
-            print(ev)
-            print(pop)
+            print(evaluation)
+            print(population)
         i += 1
-    print('size of population =', len(pop))
-    print('min(ev) =', min(ev))
+    print('size of population =', len(population))
+    print('min(evaluation) =', min(evaluation))
     print('i =', i)
-    solution = pop[ev.index(min(ev))]
+    solution = population[evaluation.index(min(evaluation))]
     print('eval_indie(solution) =', eval_indie(solution))
-    pprint_gen(solution)#  pop[0])
-    visualize_gen(solution)
+    print(solution)#  population[0])
+    visualize_gene(solution)
 
 solve_it()
+
+
+def evaluate_test(a):
+    print(evaluate([a]))
+
+def diagonal_hits_test():
+    print('diagonal_hits_tests...')
+    assert diagonal_hits((0,0)) == [(1,1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7)], ('erro: ', diagonal_hits((1,1)))
+    print('OK')
+
+def eval_indie_test():
+    chosen = [2, 7, 0, 6, 1, 3, 4, 5]
+    print(chosen)
+    print('-> %d' % (eval_indie(chosen)))
+
+def select_parents_test():
+    for i in select_parents(initialise(10)):
+        print(i)
+
+def recombine_test():
+    for i in range(1):
+        p = initialise(10)[:2]
+        print(p[0])
+        print(p[1])
+        p = recombine(p)
+        print(p[0])
+        print(p[1])
+
+def mutate_test():
+    indie = [initialise(10)[1]]
+    for i in indie:
+        print(i)
+    mutated = mutate(indie)
+    for i in mutated:
+        print(i)
+
