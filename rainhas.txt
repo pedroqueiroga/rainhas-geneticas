@@ -5,3 +5,4 @@ Coloquei uma função de mutação, antes estava sem, porque eu achei que não p
 (1) Agora tem uma população crescente, com controle de população, e morte por idade além da morte por fitness.
 
 TODO: verificar com e sem (1), e procurar por bons parâmetros.
+TODO: algoritmo genético cujos cromossomos são esses parâmetros, e buscar pelos parâmetros que convergem mais rápido. Isso cria um problema circular, pois o algoritmo genético terá parâmetros a serem melhorados, mas acho que posso ignorar e só me importar com os parâmetros nas rainhas.
