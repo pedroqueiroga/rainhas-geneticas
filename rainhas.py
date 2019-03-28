@@ -13,7 +13,7 @@ import random
 class RainhasGeneticas:
     """A class that represents a set of tunable parameters"""
 
-    def __init__(self, pop_init_size, mutation_chance, grow_population, population_limit, die_by_age, converge_all=False, verbose=False):
+    def __init__(self, pop_init_size=10, mutation_chance=0.3, grow_population=False, population_limit=0, die_by_age=False, converge_all=False, verbose=True):
         self.pop_init_size = pop_init_size
         self.mutation_chance = mutation_chance
         self.grow_population = grow_population
@@ -23,14 +23,30 @@ class RainhasGeneticas:
         self.verbose = verbose
         self.population = []
         self.current_generation = 0
+        self.__initial_gene=list('000001010011100101110111')
 
     def initialise(self):
-        # population is represented as an array where each index is the column,
-        # and the elements are the lines. 
-        # ex: [0, 1, 2, 3, 4, 5, 6, 7] is a diagonal composed of queens.
-        initial_gene = [0, 1, 2, 3, 4, 5, 6, 7]
-        self.population = [ random.sample(initial_gene, len(initial_gene)) for i in range(self.pop_init_size) ]
+        # population is represented as a string of bits representing an array
+        # where 3 bits make one element of that array.
+        # each index is the column, and the elements are the lines. 
+        # ex:           [ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 ] is a diagonal composed of queens.
+        # alternatively: 000 001 010 011 100 101 110 111 -> '000001010011100101110111'
+        self.population = [ random.sample(self.__initial_gene, len(self.__initial_gene)) for i in range(self.pop_init_size) ]
         self.current_generation = 0
+
+    def __bs_fisher_yates(self, s, element_len=3):
+        """bs stands for bit string!"""
+        i = int(len(s)/element_len) - 1
+        while i > 0:
+            j = random.randint(0,i)
+
+            trans_i=i*element_len
+            trans_j=j*element_len
+            
+            for k in range(element_len):
+                s[trans_j+k],s[trans_i+k]=s[trans_i+k],s[trans_j+k]
+                
+            i -= 1
 
     def evaluate(self, population):
         evaluation = [ self.eval_indie(i) for i in population ]
