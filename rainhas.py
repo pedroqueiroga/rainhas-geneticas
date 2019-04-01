@@ -40,11 +40,7 @@ class RainhasGeneticas:
         penalty = 0
         seen = []
         for (idx, val) in enumerate(indie):
-            for s in seen:
-                if val == s[1]:
-                    penalty += 1
-            else:
-                seen.append((idx, val))
+            seen.append((idx, val))
             if not set(seen).isdisjoint(self.diagonal_hits((idx, val))):
                 penalty += 1
         return penalty
@@ -129,8 +125,7 @@ class RainhasGeneticas:
         if self.converge_all:
             func = max
         while func(evaluation) != 0 and self.current_generation < 20000:
-            if min(evaluation) == 0:
-                print('Found one!')
+            # print(evaluation)
             parents = self.select_parents()
             offspring = self.mutate(self.recombine(parents))
             if self.grow_population:
