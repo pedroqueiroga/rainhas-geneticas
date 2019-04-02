@@ -6,3 +6,54 @@ Coloquei uma função de mutação, antes estava sem, porque eu achei que não p
 
 TODO: verificar com e sem (1), e procurar por bons parâmetros.
 TODO: algoritmo genético cujos cromossomos são esses parâmetros, e buscar pelos parâmetros que convergem mais rápido. Isso cria um problema circular, pois o algoritmo genético terá parâmetros a serem melhorados, mas acho que posso ignorar e só me importar com os parâmetros nas rainhas.
+
+
+testes bit-string com penalização por seen, que provavelmentes está errada no bit-string, pois sequer ela faz sentido, não deveria atrapalhar tanto na hora de convergir! 
+
+bit-string representation.
+number of runs: 30
+starting...  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30 done.
+ran for 343.54 seconds.
+successes: 22
+average individual evaluation: 1.603333333333333
+average worst individual: 4.7
+
+bit-string representation.
+number of runs: 50
+starting...  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50 done.
+ran for 391.17 seconds.
+successes: 41
+average individual evaluation: 1.5020000000000002
+average worst individual: 4.6
+
+agora retirei a tanguice da pena, esta convergindo BEM mais rapido
+e mais corretamente (average worst menor, e average individual menor)
+
+bit-string representation.
+number of runs: 50
+starting...  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50 done.
+ran for 3.66 seconds.
+successes: 50
+average individual evaluation: 1.4920000000000002
+average worst individual: 3.36
+
+bit-string representation.
+number of runs: 100
+starting...  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90  91  92  93  94  95  96  97  98  99  100 done.
+ran for 8.88 seconds.
+successes: 100
+average individual evaluation: 1.4269999999999998
+average worst individual: 3.04
+
+agora com algumas informações extra
+
+bit-string representation.
+number of runs: 100
+starting...  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90  91  92  93  94  95  96  97  98  99  100 done.
+ran for 8.51 seconds.
+successes: 100
+average number of generations: 67.56
+least number of generations needed: 6
+largest number of generations needed: 259
+average individual evaluation: 1.3770000000000002
+average worst individual: 2.93

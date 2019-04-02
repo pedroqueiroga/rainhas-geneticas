@@ -50,7 +50,9 @@ class RainhasGeneticas:
             i -= 1
         return s
 
-    def evaluate(self, population, element_len):
+    def evaluate(self, population, element_len=None):
+        if not element_len:
+            element_len = self.__element_len
         evaluation = [ self.eval_indie(i, element_len) for i in population ]
         return evaluation
 
@@ -64,11 +66,7 @@ class RainhasGeneticas:
                 parsed_num += indie[idx]
                 idx+=1
             val = int(parsed_num, 2)
-            for s in seen:
-                if val == s[1]:
-                    penalty += 1
-            else:
-                seen.append((int(idx/element_len), val))
+            seen.append((int(idx/element_len), val))
             if not set(seen).isdisjoint(self.diagonal_hits((int(idx/element_len), val))):
                 penalty += 1
         return penalty
@@ -173,7 +171,7 @@ class RainhasGeneticas:
             self.population = self.population + offspring
             # print('pos-selecao',len(pop))
             evaluation = self.evaluate(self.population, self.__element_len)
-            if self.current_generation % 500 == 0 and self.verbose:
+            if self.verbose and self.current_generation % 500 == 0:
                 print('current generation:',self.current_generation)
                 print(evaluation)
                 print(self.population)
@@ -187,7 +185,18 @@ class RainhasGeneticas:
         print(solution)#  population[0])
         self.visualize_gene(solution)
         '''
-        print('done in ', self.current_generation, ' generations. worst individual: ', max(evaluation), '. average: ', sum(evaluation)/len(evaluation), '.', sep='')
+        end_result = {
+            "success": min(evaluation)==0,
+            "populationEndSize": len(self.population),
+            "populationInitSize": self.pop_init_size,
+            "evaluation": evaluation,
+            "population": self.population,
+            "numberOfGenerations": self.current_generation,
+            "worstIndividual": max(evaluation),
+            "averageIndividual": sum(evaluation)/len(evaluation)
+        }
+#        print('done in ', end_result["numberOfGenerations"], ' generations. worst individual: ', end_result["worstIndividual"], '. average: ', end_result["averageIndividual"], '.', sep='')
+        return end_result
 
 
     def evaluate_test(self, a):
