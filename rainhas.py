@@ -56,7 +56,9 @@ class RainhasGeneticas:
         evaluation = [ self.eval_indie(i, element_len) for i in population ]
         return evaluation
 
-    def eval_indie(self, indie, element_len):
+    def eval_indie(self, indie, element_len=None):
+        if not element_len:
+            element_len = self.__element_len
         penalty = 0
         seen = []
         idx = 0
@@ -98,27 +100,42 @@ class RainhasGeneticas:
         # my recombine function will choose a random number to cut,
         # and then find where they appear on each other's genes,
         # so i'll keep it always a permutation.
+        elen = self.__element_len
         p1,p2 = parents[0].copy(),parents[1].copy()
-        max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
+        max_cuttings = int(len(p1) / 12) # p1 and p2 are the same length
         to_cut = random.choices(range(8),k=max_cuttings)
         for v in to_cut:
-            for (idx,j) in enumerate(p2):
-                parsed_parent = [p1[v*3 + i] for i in range(self.__element_len)]
-                if p1[v*3] == j:
+            pp1 = '0b'
+
+            for i in range(elen):
+                pp1 += p1[v*elen+i]
+                
+            for (idx,j) in enumerate(range(8)):
+                # 
+                pp2 = '0b'
+
+                for i in range(elen):
+                    pp2 += p2[idx*elen+i]
+
+                if pp1 == pp2:
+                    # found where pp1 happens on pp2, which is on index idx*elen + 0 + 1 + 2
                     # i'll exchange the indexes
-                    p1[v],p1[idx]=p1[idx],p1[v]
-                    p2[v],p2[idx]=p2[idx],p2[v]
+                    for i in range(elen):
+                        p1[v*elen+i],p1[idx*elen+i]=p1[idx*elen+i],p1[v*elen+i]
+                        p2[v*elen+i],p2[idx*elen+i]=p2[idx*elen+i],p2[v*elen+i]
                 else:
                     continue
         return [p1,p2]
 
     def mutate(self, offspring):
         # i'll mutate an individual by permutating random indexes.
+        elen = self.__element_len
         for o in offspring:
-            for (idx,_) in enumerate(o):
+            for idx in range(int(len(o)/3)):
                 if random.random() < self.mutation_chance:
                     other_idx=random.randrange(8)
-                    o[idx],o[other_idx]=o[other_idx],o[idx]
+                    for i in range(elen):
+                        o[idx*elen + i],o[other_idx*elen + i]=o[other_idx*elen + i],o[idx*elen + i]
 
         return offspring # off_ret
 
@@ -135,9 +152,13 @@ class RainhasGeneticas:
         # print('post-select:', len(self.population))
 
     def visualize_gene(self, g):
-        for i in g:
+        for i in range(int(len(g)/self.__element_len)):
+            parsed_num = '0b'
+            for ii in range(self.__element_len):
+                parsed_num += g[i*3+ii]
+            val = int(parsed_num, 2)
             for j in range(8):
-                if j==i:
+                if j==val:
                     print('q',end='')
                 else:
                     print('.',end='')
@@ -176,15 +197,15 @@ class RainhasGeneticas:
                 print(evaluation)
                 print(self.population)
             self.current_generation += 1
-        '''
-        print('size of population =', len(self.population))
-        print('min(evaluation) =', min(evaluation))
-        print('current generation =', self.current_generation)
-        solution = self.population[evaluation.index(min(evaluation))]
-        print('eval_indie(solution) =', self.eval_indie(solution))
-        print(solution)#  population[0])
-        self.visualize_gene(solution)
-        '''
+        if self.verbose:
+            print('size of population =', len(self.population))
+            print('min(evaluation) =', min(evaluation))
+            print('current generation =', self.current_generation)
+            solution = self.population[evaluation.index(min(evaluation))]
+            print('eval_indie(solution) =', self.eval_indie(solution))
+            print(solution)#  population[0])
+            self.visualize_gene(solution)
+        
         end_result = {
             "success": min(evaluation)==0,
             "populationEndSize": len(self.population),
