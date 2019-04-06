@@ -23,18 +23,17 @@ class RainhasGeneticas:
         self.verbose = verbose
         self.population = []
         self.current_generation = 0
-        self.__initial_gene=list('000001010011100101110111')
-        self.__element_len=3
+        self.__initial_gene=[0,1,2,3,4,5,6,7]
 
     def initialise(self):
-        # population is represented as a string of bits representing an array
-        # where 3 bits make one element of that array.
+        # population is represented as an array where each 
         # each index is the column, and the elements are the lines.
-        # ex:           [ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 ] is a diagonal composed of queens.
-        # alternatively: 000 001 010 011 100 101 110 111 -> '000001010011100101110111'
-        self.population = [ self.__bs_fisher_yates(self.__initial_gene, self.__element_len) for i in range(self.pop_init_size) ]
+        # ex: [0,1,2,3,4,5,6,7] is a diagonal of queens.
+
+        self.population = [ random.sample(self.__initial_gene, len(self.__initial_gene)) for i in range(self.pop_init_size) ]
         self.current_generation = 0
 
+    # used for bitstring representation
     def __bs_fisher_yates(self, s, element_len=3):
         """bs stands for bit string!"""
         i = int(len(s)/element_len) - 1
@@ -50,26 +49,16 @@ class RainhasGeneticas:
             i -= 1
         return s
 
-    def evaluate(self, population, element_len=None):
-        if not element_len:
-            element_len = self.__element_len
-        evaluation = [ self.eval_indie(i, element_len) for i in population ]
+    def evaluate(self, population):
+        evaluation = [ self.eval_indie(i) for i in population ]
         return evaluation
 
-    def eval_indie(self, indie, element_len=None):
-        if not element_len:
-            element_len = self.__element_len
+    def eval_indie(self, indie):
         penalty = 0
         seen = []
-        idx = 0
-        while idx < len(indie):
-            parsed_num = '0b'
-            for i in range(element_len):
-                parsed_num += indie[idx]
-                idx+=1
-            val = int(parsed_num, 2)
-            seen.append((int(idx/element_len), val))
-            if not set(seen).isdisjoint(self.diagonal_hits((int(idx/element_len), val))):
+        for (idx, val) in enumerate(indie):
+            seen.append((idx, val))
+            if not set(seen).isdisjoint(self.diagonal_hits((idx, val))):
                 penalty += 1
         return penalty
 
@@ -92,7 +81,7 @@ class RainhasGeneticas:
     def select_parents(self):
         # choose 5 random individuals, and then get the best 2 of those.
         random_five_parents = random.choices(self.population, k=5)
-        parents_evaluation = self.evaluate(random_five_parents, self.__element_len)
+        parents_evaluation = self.evaluate(random_five_parents)
         best_two_parents,_ = zip(*sorted(zip(random_five_parents, parents_evaluation), key=lambda x: x[1]))
         return list(best_two_parents[:2])
 
@@ -100,48 +89,35 @@ class RainhasGeneticas:
         # my recombine function will choose a random number to cut,
         # and then find where they appear on each other's genes,
         # so i'll keep it always a permutation.
-        elen = self.__element_len
+        # my recombine function will choose a random number to cut,
+        # and then find where they appear on each other's genes,
+        # so i'll keep it always a permutation.
         p1,p2 = parents[0].copy(),parents[1].copy()
-        max_cuttings = int(len(p1) / 12) # p1 and p2 are the same length
+        max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
         to_cut = random.choices(range(8),k=max_cuttings)
         for v in to_cut:
-            pp1 = '0b'
-
-            for i in range(elen):
-                pp1 += p1[v*elen+i]
-                
-            for (idx,j) in enumerate(range(8)):
-                # 
-                pp2 = '0b'
-
-                for i in range(elen):
-                    pp2 += p2[idx*elen+i]
-
-                if pp1 == pp2:
-                    # found where pp1 happens on pp2, which is on index idx*elen + 0 + 1 + 2
+            for (idx,j) in enumerate(p2):
+                if p1[v] == j:
                     # i'll exchange the indexes
-                    for i in range(elen):
-                        p1[v*elen+i],p1[idx*elen+i]=p1[idx*elen+i],p1[v*elen+i]
-                        p2[v*elen+i],p2[idx*elen+i]=p2[idx*elen+i],p2[v*elen+i]
+                    p1[v],p1[idx]=p1[idx],p1[v]
+                    p2[v],p2[idx]=p2[idx],p2[v]
                 else:
                     continue
         return [p1,p2]
 
     def mutate(self, offspring):
         # i'll mutate an individual by permutating random indexes.
-        elen = self.__element_len
         for o in offspring:
-            for idx in range(int(len(o)/3)):
+            for (idx,_) in enumerate(o):
                 if random.random() < self.mutation_chance:
                     other_idx=random.randrange(8)
-                    for i in range(elen):
-                        o[idx*elen + i],o[other_idx*elen + i]=o[other_idx*elen + i],o[idx*elen + i]
+                    o[idx],o[other_idx]=o[other_idx],o[idx]
 
         return offspring # off_ret
 
     def select_survivors(self):
         # two worst individuals won't be considered for the next generation.
-        evaluation = self.evaluate(self.population, self.__element_len)
+        evaluation = self.evaluate(self.population)
         # print('pre-select:', len(population))
         minney = evaluation.index(max(evaluation))
         del self.population[minney]
@@ -152,13 +128,9 @@ class RainhasGeneticas:
         # print('post-select:', len(self.population))
 
     def visualize_gene(self, g):
-        for i in range(int(len(g)/self.__element_len)):
-            parsed_num = '0b'
-            for ii in range(self.__element_len):
-                parsed_num += g[i*3+ii]
-            val = int(parsed_num, 2)
+        for i in g:
             for j in range(8):
-                if j==val:
+                if j==i:
                     print('q',end='')
                 else:
                     print('.',end='')
@@ -168,7 +140,7 @@ class RainhasGeneticas:
 
     def solve_it(self):
         self.initialise()
-        evaluation = self.evaluate(self.population, self.__element_len)
+        evaluation = self.evaluate(self.population)
         func = min
         occ=0
         if self.converge_all:
@@ -191,7 +163,7 @@ class RainhasGeneticas:
             self.select_survivors()
             self.population = self.population + offspring
             # print('pos-selecao',len(pop))
-            evaluation = self.evaluate(self.population, self.__element_len)
+            evaluation = self.evaluate(self.population)
             if self.verbose and self.current_generation % 500 == 0:
                 print('current generation:',self.current_generation)
                 print(evaluation)

@@ -21,7 +21,7 @@ rainhas = RainhasGeneticas(pop_init_size, mutation_chance, grow_population, popu
 runs = []
 t_0 = time.time()
 k=100
-print("bit-string representation.")
+print("array of integers representation.")
 print("number of runs:",k)
 print("starting... ",end='', flush=True)
 for i in range(k):
@@ -37,3 +37,11 @@ print("least number of generations needed:", min(i["numberOfGenerations"] for i 
 print("largest number of generations needed:", max(i["numberOfGenerations"] for i in runs))
 print("average individual evaluation:", sum(i["averageIndividual"] for i in runs)/len(runs))
 print("average worst individual:", sum(i["worstIndividual"] for i in runs)/len(runs))
+
+"""
+print("-"*80)
+for r in runs:
+    solution_index = r["evaluation"].index(0)
+    rainhas.visualize_gene(r["population"][solution_index])
+    print("-"*80)
+"""
