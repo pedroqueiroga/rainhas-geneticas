@@ -89,9 +89,6 @@ class RainhasGeneticas:
         # my recombine function will choose a random number to cut,
         # and then find where they appear on each other's genes,
         # so i'll keep it always a permutation.
-        # my recombine function will choose a random number to cut,
-        # and then find where they appear on each other's genes,
-        # so i'll keep it always a permutation.
         p1,p2 = parents[0].copy(),parents[1].copy()
         max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
         to_cut = random.choices(range(8),k=max_cuttings)
@@ -113,19 +110,16 @@ class RainhasGeneticas:
                     other_idx=random.randrange(8)
                     o[idx],o[other_idx]=o[other_idx],o[idx]
 
-        return offspring # off_ret
+        return offspring
 
     def select_survivors(self):
         # two worst individuals won't be considered for the next generation.
         evaluation = self.evaluate(self.population)
-        # print('pre-select:', len(population))
         minney = evaluation.index(max(evaluation))
         del self.population[minney]
         del evaluation[minney]
         minney = evaluation.index(max(evaluation))
         del self.population[minney]
-
-        # print('post-select:', len(self.population))
 
     def visualize_gene(self, g):
         for i in g:
@@ -150,16 +144,12 @@ class RainhasGeneticas:
             offspring = self.mutate(self.recombine(parents))
             if self.grow_population:
                 if len(self.population) < self.population_limit: # controle populacional
-                    # print('i=',i,len(pop))
                     self.population = self.population + offspring
-                    # print('p',len(pop))
             if self.die_by_age:
                 if self.current_generation % 10 == 0: # morte por idade
                     self.population = self.population[2:]
-                    # print('morte por idade', len(pop))'''
             self.select_survivors()
             self.population = self.population + offspring
-            # print('pos-selecao',len(pop))
             evaluation = self.evaluate(self.population)
             if self.verbose and self.current_generation % 500 == 0:
                 print('current generation:',self.current_generation)
@@ -172,7 +162,7 @@ class RainhasGeneticas:
             print('current generation =', self.current_generation)
             solution = self.population[evaluation.index(min(evaluation))]
             print('eval_indie(solution) =', self.eval_indie(solution))
-            print(solution)#  population[0])
+            print(solution)
             self.visualize_gene(solution)
         
         end_result = {
@@ -185,7 +175,6 @@ class RainhasGeneticas:
             "worstIndividual": max(evaluation),
             "averageIndividual": sum(evaluation)/len(evaluation)
         }
-#        print('done in ', end_result["numberOfGenerations"], ' generations. worst individual: ', end_result["worstIndividual"], '. average: ', end_result["averageIndividual"], '.', sep='')
         return end_result
 
 
@@ -226,7 +215,3 @@ class RainhasGeneticas:
         mutated = self.mutate(indie)
         for i in mutated:
             print(i)
-
-
-# rainhas = RainhasGeneticas(2, 0.3, True, 20, True)
-# rainhas.solve_it()

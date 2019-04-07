@@ -37,7 +37,6 @@ print("starting... ")
 for i in range(k):
     runs.append(rainhas.solve_it())
     print("\r", i+1, " of ", k, " (%.2f" % ((i+1)/k * 100), " %)", sep='', end='', flush=True)
-    # print(rainhas.evaluate(rainhas.population))
 t_f = time.time()
 print(" done.")
 print("ran for %.2f seconds." % (t_f-t_0))
