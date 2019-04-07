@@ -13,7 +13,7 @@ mutation_chance=0.1
 grow_population=False
 population_limit=20
 die_by_age=False
-converge_all=False
+converge_all=True
 verbose=False
 
 rainhas = RainhasGeneticas(pop_init_size, mutation_chance, grow_population, population_limit, die_by_age, converge_all, verbose)
@@ -22,6 +22,15 @@ runs = []
 t_0 = time.time()
 k=100
 print("array of integers representation.")
+if grow_population:
+    print("population growth activated. limit =", population_limit,end='. ')
+if die_by_age:
+    print("death by age activated.", end=' ')
+if converge_all:
+    print("converging all individuals.", end='')
+if grow_population or die_by_age or converge_all:
+    print()
+print("-"*80)
 print("number of runs:",k)
 print("starting... ",end='', flush=True)
 for i in range(k):
