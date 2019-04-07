@@ -13,13 +13,15 @@ import random
 class RainhasGeneticas:
     """A class that represents a set of tunable parameters"""
 
-    def __init__(self, pop_init_size=10, mutation_chance=0.3, grow_population=False, population_limit=0, die_by_age=False, converge_all=False, verbose=True):
+    def __init__(self, pop_init_size=10, mutation_chance=0.3, recombination_chance=0.9, grow_population=False, population_limit=0, die_by_age=False, converge_all=False, oldrecmut=False, verbose=True):
         self.pop_init_size = pop_init_size
         self.mutation_chance = mutation_chance
+        self.recombination_chance = recombination_chance
         self.grow_population = grow_population
         self.population_limit = population_limit
         self.die_by_age = die_by_age
         self.converge_all = converge_all
+        self.oldrecmut = oldrecmut
         self.verbose = verbose
         self.population = []
         self.current_generation = 0
@@ -57,6 +59,9 @@ class RainhasGeneticas:
         penalty = 0
         seen = []
         for (idx, val) in enumerate(indie):
+            for s in seen:
+                if val == s[1]:
+                    penalty += 1
             seen.append((idx, val))
             if not set(seen).isdisjoint(self.diagonal_hits((idx, val))):
                 penalty += 1
@@ -90,26 +95,74 @@ class RainhasGeneticas:
         # and then find where they appear on each other's genes,
         # so i'll keep it always a permutation.
         p1,p2 = parents[0].copy(),parents[1].copy()
-        max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
-        to_cut = random.choices(range(len(p1)),k=max_cuttings)
-        for v in to_cut:
-            for (idx,j) in enumerate(p2):
-                if p1[v] == j:
-                    # i'll exchange the indexes
-                    p1[v],p1[idx]=p1[idx],p1[v]
-                    p2[v],p2[idx]=p2[idx],p2[v]
-                else:
-                    continue
+        if random.random() < self.recombination_chance:
+            max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
+            to_cut = random.choices(range(len(p1)),k=max_cuttings)
+            for v in to_cut:
+                for (idx,j) in enumerate(p2):
+                    if p1[v] == j:
+                        # i'll exchange the indexes
+                        p1[v],p1[idx]=p1[idx],p1[v]
+                        p2[v],p2[idx]=p2[idx],p2[v]
+                    else:
+                        continue
         return [p1,p2]
 
     def old_recombine(self, parents):
         """recombination as before full permutation manipulation"""
-        pass
+        p1,p2 = parents[0].copy(), parents[1].copy()
+        if random.random() < self.recombination_chance:
+            # i'll cut a section that will be correspond to half of the gene
+            # or lower. least being a fourth of the genetic information...
+            to_cut = random.choice(range(int(len(p1)/4), int(len(p1)/2)+1))
+            # insert recombination chance here, 90% as seen in class.
+            p1[:to_cut],p2[:to_cut] = p2[:to_cut],p1[:to_cut]
+
+        return [p1,p2]
 
     def old_mutate(self, offspring):
         """mutation as before full permutation manipulation"""
-        pass
+        # this mutation function will use gray code
+        for o in offspring:
+            for (idx,_) in enumerate(o):
+                before_mutation = o[idx]
+                gray = self.binary_to_gray(before_mutation)
+                if random.random() < self.mutation_chance:
+                    gray = gray ^ 1
+                if random.random() < self.mutation_chance:
+                    gray = gray ^ 2
+                if random.random() < self.mutation_chance:
+                    gray = gray ^ 4
+                    
+                o[idx] = self.gray_to_binary(gray)
+                
+        return offspring
 
+    def binary_to_gray(self, num):
+        """
+         This function converts an unsigned binary
+         number to reflected binary Gray code.
+         The operator >> is shift right. The operator ^ is exclusive or.
+        taken from wikipedia https://en.wikipedia.org/wiki/Gray_code
+        """
+        return num ^ (num >> 1)
+    
+    def gray_to_binary(self, num):
+        """
+         This function converts a reflected binary
+         Gray code number to a binary number.
+         Each Gray code bit is exclusive-ored with all
+         more significant bits.
+        taken from wikipedia https://en.wikipedia.org/wiki/Gray_code
+        """
+        mask = num >> 1
+
+        while (mask != 0):
+            num = num ^ mask
+            mask = mask >> 1
+
+        return num
+    
     def mutate(self, offspring):
         # i'll mutate an individual by permutating random indexes.
         for o in offspring:
@@ -149,7 +202,11 @@ class RainhasGeneticas:
             func = max
         while func(evaluation) != 0 and self.current_generation < 20000:
             parents = self.select_parents()
-            offspring = self.mutate(self.recombine(parents))
+            offspring = []
+            if self.oldrecmut:
+                offspring = self.old_mutate(self.old_recombine(parents))
+            else:
+                offspring = self.mutate(self.recombine(parents))
             if self.grow_population:
                 if len(self.population) < self.population_limit: # controle populacional
                     self.population = self.population + offspring
