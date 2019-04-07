@@ -102,6 +102,14 @@ class RainhasGeneticas:
                     continue
         return [p1,p2]
 
+    def old_recombine(self, parents):
+        """recombination as before full permutation manipulation"""
+        pass
+
+    def old_mutate(self, offspring):
+        """mutation as before full permutation manipulation"""
+        pass
+
     def mutate(self, offspring):
         # i'll mutate an individual by permutating random indexes.
         for o in offspring:
