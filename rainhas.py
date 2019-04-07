@@ -146,9 +146,6 @@ class RainhasGeneticas:
         if self.converge_all:
             func = max
         while func(evaluation) != 0 and self.current_generation < 20000:
-            if evaluation.count(0) > occ:
-                occ += 1
-                print('Found one!')
             parents = self.select_parents()
             offspring = self.mutate(self.recombine(parents))
             if self.grow_population:
