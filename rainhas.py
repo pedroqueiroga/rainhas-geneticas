@@ -91,7 +91,7 @@ class RainhasGeneticas:
         # so i'll keep it always a permutation.
         p1,p2 = parents[0].copy(),parents[1].copy()
         max_cuttings = int(len(p1) / 4) # p1 and p2 are the same length
-        to_cut = random.choices(range(8),k=max_cuttings)
+        to_cut = random.choices(range(len(p1)),k=max_cuttings)
         for v in to_cut:
             for (idx,j) in enumerate(p2):
                 if p1[v] == j:
