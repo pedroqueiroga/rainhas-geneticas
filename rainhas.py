@@ -13,7 +13,7 @@ import random
 class RainhasGeneticas:
     """A class that represents a set of tunable parameters"""
 
-    def __init__(self, pop_init_size=10, mutation_chance=0.3, recombination_chance=0.9, grow_population=False, population_limit=0, die_by_age=False, converge_all=False, oldrecmut=False, verbose=True):
+    def __init__(self, pop_init_size=10, mutation_chance=0.3, recombination_chance=0.9, grow_population=False, population_limit=0, die_by_age=False, converge_all=False, simple_recombination=False, simple_mutation=False, roulette=False, verbose=True):
         self.pop_init_size = pop_init_size
         self.mutation_chance = mutation_chance
         self.recombination_chance = recombination_chance
@@ -21,7 +21,9 @@ class RainhasGeneticas:
         self.population_limit = population_limit
         self.die_by_age = die_by_age
         self.converge_all = converge_all
-        self.oldrecmut = oldrecmut
+        self.simple_recombination = simple_recombination
+        self.simple_mutation = simple_mutation
+        self.roulette = roulette
         self.verbose = verbose
         self.population = []
         self.current_generation = 0
@@ -83,12 +85,18 @@ class RainhasGeneticas:
                     positions_hit.append((line-i, column+i))
         return positions_hit
 
-    def select_parents(self):
+    def select_parents_tournament(self):
         # choose 5 random individuals, and then get the best 2 of those.
+        # pick_n = int(0.5*len(self.population))
         random_five_parents = random.choices(self.population, k=5)
         parents_evaluation = self.evaluate(random_five_parents)
         best_two_parents,_ = zip(*sorted(zip(random_five_parents, parents_evaluation), key=lambda x: x[1]))
         return list(best_two_parents[:2])
+
+    def select_parents_roulette(self, evaluation):
+        w = [ 1/(1+i) for i in evaluation ]
+        random_parents = random.choices(self.population, weights=w, k=2)
+        return random_parents
 
     def recombine(self, parents):
         # my recombine function will choose a random number to cut,
@@ -201,12 +209,20 @@ class RainhasGeneticas:
         if self.converge_all:
             func = max
         while func(evaluation) != 0 and self.current_generation < 20000:
-            parents = self.select_parents()
-            offspring = []
-            if self.oldrecmut:
-                offspring = self.old_mutate(self.old_recombine(parents))
+            parents = []
+            if self.roulette:
+                parents = self.select_parents_roulette(evaluation)
             else:
-                offspring = self.mutate(self.recombine(parents))
+                parents = self.select_parents_tournament()
+            offspring = []
+            if self.simple_recombination:
+                offspring = self.old_recombine(parents)
+            else:
+                offspring = self.recombine(parents)
+            if self.simple_mutation:
+                offspring = self.old_mutate(offspring)
+            else:
+                offspring = self.mutate(offspring)
             if self.grow_population:
                 if len(self.population) < self.population_limit: # controle populacional
                     self.population = self.population + offspring

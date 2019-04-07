@@ -28,3 +28,122 @@ least number of generations needed: 0
 largest number of generations needed: 904
 average individual evaluation: 1.3160000000000003
 average worst individual: 2.32
+
+
+array of integers representation.
+population size = 10. mutation chance = 10.0 %. recombination chance = 90.0 %
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 8.52 seconds.
+successes: 100
+average number of generations: 99.79
+least number of generations needed: 0
+largest number of generations needed: 935
+average individual evaluation: 1.3020000000000005
+average worst individual: 2.42
+
+array of integers representation.
+population size = 100. mutation chance = 10.0 %. recombination chance = 90.0 %
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 51.15 seconds.
+successes: 100
+average number of generations: 73.45
+least number of generations needed: 0
+largest number of generations needed: 390
+average individual evaluation: 2.6155
+average worst individual: 4.29
+
+COM UMA POPULACAO MAIOR LEVOU MAIS TEMPO, mas precisou na media de menos geracoes
+e o pior caso teve menos geracao tb. o individuo medio ficou pior (o dobro), e o pior médio ficou pior tb (pouco menos que o dobro), o que faz sentido, já que vai ter mais diversidade.
+
+array of integers representation.
+population size = 10. mutation chance = 10.0 %. recombination chance = 90.0 %
+using old recombination and mutation functions. 
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 479.03 seconds.
+successes: 89
+average number of generations: 5269.02
+least number of generations needed: 0
+largest number of generations needed: 20000
+average individual evaluation: 1.3550000000000002
+average worst individual: 4.05
+
+array of integers representation.
+population size = 100
+using old recombination and mutation functions. 
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 30
+starting... 
+30 of 30 (100.00 %) done.
+ran for 713.84 seconds.
+successes: 28
+average number of generations: 3463.1
+least number of generations needed: 0
+largest number of generations needed: 20000
+average individual evaluation: 1.9063333333333334
+average worst individual: 4.966666666666667
+
+
+Esses resultados me levam a crer que a estratégia de selecionar k=5 aleatoriamente, para escolher os 2 melhores desses, é muito ruim para uma população grande. Talvez um k percentual seja melhor. Inspirado em 5 ser bem bom para 10, vou fazer k=50% do tamanho da população. Talvez seja melhor ainda ser bastante elitista e fazer k = 100% da população. veremos.
+
+com k = 0.5 * len(population):
+
+array of integers representation.
+population size = 10. mutation chance = 10.0 %. recombination chance = 90.0 %
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 17.76 seconds.
+successes: 100
+average number of generations: 170.87
+least number of generations needed: 4
+largest number of generations needed: 1843
+average individual evaluation: 1.1480000000000001
+average worst individual: 2.17
+
+array of integers representation.
+population size = 100. mutation chance = 10.0 %. recombination chance = 90.0 %
+using tournament for selection.
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 189.82 seconds.
+successes: 100
+average number of generations: 188.36
+least number of generations needed: 0
+largest number of generations needed: 1584
+average individual evaluation: 2.0945
+average worst individual: 3.75
+
+caramba, ficou pior pegando 50% da populacao pra escolher 2 melhores quando o tamanho da populacao eh 100 vei...
+
+array of integers representation.
+population size = 10. mutation chance = 10.0 %. recombination chance = 90.0 %
+using tournament for selection.
+using old recombination and mutation functions. 
+--------------------------------------------------------------------------------
+number of runs: 100
+starting... 
+100 of 100 (100.00 %) done.
+ran for 545.78 seconds.
+successes: 91
+average number of generations: 4966.74
+least number of generations needed: 0
+largest number of generations needed: 20000
+average individual evaluation: 1.412
+average worst individual: 4.4
